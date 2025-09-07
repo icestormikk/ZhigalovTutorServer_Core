@@ -7,7 +7,6 @@ import (
 )
 
 // User - Стандартный пользователь приложения
-// dsdasdsadasd
 type User struct {
 	gorm.Model
 	FirstName      string    `json:"first_name"`
