@@ -6,18 +6,14 @@ import (
 	"zhigalov_tutor_server_core/main/validation"
 )
 
-type ServerResponse interface {
-	Marshall() *[]byte
-}
-
-type serverResponse[T any] struct {
-	Code    uint16 `json:"code" validate:"required,gte=0"`
+type ServerResponse[T any] struct {
+	Code    uint16 `json:"code" validate:"required,gte=100,lte=599"`
 	Message string `json:"message" validate:"required"`
 	Data    *T     `json:"data"`
 }
 
-func NewServerResponse[T any](code uint16, message string, data *T) (ServerResponse, error) {
-	r := &serverResponse[T]{
+func NewServerResponse[T any](code uint16, message string, data *T) (*ServerResponse[T], error) {
+	r := &ServerResponse[T]{
 		Code:    code,
 		Message: message,
 		Data:    data,
@@ -31,7 +27,7 @@ func NewServerResponse[T any](code uint16, message string, data *T) (ServerRespo
 	return r, nil
 }
 
-func (r *serverResponse[T]) Marshall() *[]byte {
+func (r *ServerResponse[T]) Marshall() *[]byte {
 	jsonResponse, err := json.Marshal(r)
 	if err != nil {
 		log.Panicln(err)

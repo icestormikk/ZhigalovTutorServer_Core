@@ -42,6 +42,14 @@ func TestSendResponseError(t *testing.T) {
 	n1.Next = n2
 
 	assert.Panics(t, func() {
-		utils.SendResponse[Node](w, "", http.StatusInternalServerError, n1)
+		utils.SendResponse[Node](w, "Message", http.StatusInternalServerError, n1)
+	})
+}
+
+func TestSendResponseEmptyMessage(t *testing.T) {
+	w := httptest.NewRecorder()
+
+	assert.Panics(t, func() {
+		utils.SendResponse[struct{}](w, "", http.StatusInternalServerError, &struct{}{})
 	})
 }

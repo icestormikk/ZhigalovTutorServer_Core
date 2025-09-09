@@ -31,3 +31,7 @@ func main() {
 		log.Panicln("Error starting server:", err)
 	}
 }
+
+func Add(a int, b int) int {
+	return a + b
+}
