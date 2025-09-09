@@ -31,44 +31,56 @@ func (ec *EnvConfiguration) Get(key string) (string, error) {
 	return value, nil
 }
 
-func (ec *EnvConfiguration) GetInt(key string) (int, error) {
+func (ec *EnvConfiguration) GetInt(key string, defaultValue *int) (*int, error) {
 	v, err := ec.Get(key)
 	if err != nil {
-		return 0, err
+		if defaultValue == nil {
+			return nil, err
+		}
+
+		return defaultValue, nil
 	}
 
 	i, err := strconv.Atoi(v)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return i, nil
+	return &i, nil
 }
 
-func (ec *EnvConfiguration) GetFloat(key string) (float64, error) {
+func (ec *EnvConfiguration) GetFloat(key string, defaultValue *float64) (*float64, error) {
 	v, err := ec.Get(key)
 	if err != nil {
-		return 0, err
+		if defaultValue == nil {
+			return nil, err
+		}
+
+		return defaultValue, nil
 	}
 
 	f, err := strconv.ParseFloat(v, 64)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return f, nil
+	return &f, nil
 }
 
-func (ec *EnvConfiguration) GetBoolean(key string) (bool, error) {
+func (ec *EnvConfiguration) GetBool(key string, defaultValue *bool) (*bool, error) {
 	v, err := ec.Get(key)
 	if err != nil {
-		return false, err
+		if defaultValue == nil {
+			return nil, err
+		}
+
+		return defaultValue, nil
 	}
 
 	b, err := strconv.ParseBool(v)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	return b, nil
+	return &b, nil
 }
