@@ -13,7 +13,7 @@ func NewPostgresUserRepository(database interfaces.Database) *PostgresUserReposi
 	return &PostgresUserRepository{database: &database}
 }
 
-func (p *PostgresUserRepository) ReadUsers(query *any, args ...any) (*[]structs.User, error) {
+func (p *PostgresUserRepository) ReadUsers(query *structs.User, args ...any) (*[]structs.User, error) {
 	users, err := (*p.database).SelectUsers(query, args)
 	if err != nil {
 		return nil, err
@@ -22,17 +22,36 @@ func (p *PostgresUserRepository) ReadUsers(query *any, args ...any) (*[]structs.
 	return users, nil
 }
 
-func (p *PostgresUserRepository) CreateUser(user structs.User) (*structs.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (p *PostgresUserRepository) CreateUser(model *structs.UserRegisterModel) (*structs.User, error) {
+	user := &structs.User{
+		FirstName:      model.FirstName,
+		LastName:       model.LastName,
+		Email:          model.Email,
+		HashedPassword: model.Password,
+		BirthDate:      model.BirthDate,
+	}
+
+	db := *p.database
+	createdUser, err := db.CreateUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return createdUser, nil
 }
 
-func (p *PostgresUserRepository) UpdateUser(user structs.User) (*structs.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (p *PostgresUserRepository) UpdateUser(user *structs.User) (*structs.User, error) {
+	database := *p.database
+
+	updatedUser, err := database.UpdateUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedUser, nil
 }
 
-func (p *PostgresUserRepository) DeleteUser(query *any, args ...any) {
+func (p *PostgresUserRepository) DeleteUser(query *structs.User, args ...any) {
 	//TODO implement me
 	panic("implement me")
 }

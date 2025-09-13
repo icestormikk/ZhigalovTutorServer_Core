@@ -12,7 +12,7 @@ import (
 )
 
 type PostgresDatabase struct {
-	db *gorm.DB
+	client *gorm.DB
 }
 
 func NewPostgresDatabase(cfg interfaces.Configuration) *PostgresDatabase {
@@ -37,7 +37,7 @@ func NewPostgresDatabase(cfg interfaces.Configuration) *PostgresDatabase {
 	if err != nil {
 		log.Panicln("Error while connecting to the database: " + err.Error())
 	}
-	log.Println("Database connection established")
+	log.Println("Database connection established.")
 
 	log.Println("Migrating..")
 	err = db.AutoMigrate(&structs.User{})
@@ -46,13 +46,13 @@ func NewPostgresDatabase(cfg interfaces.Configuration) *PostgresDatabase {
 	}
 	log.Println("Database migrated successfully")
 
-	return &PostgresDatabase{db: db}
+	return &PostgresDatabase{client: db}
 }
 
-func (pd *PostgresDatabase) SelectUser(query any, args ...any) (*structs.User, error) {
+func (pd *PostgresDatabase) SelectUser(query *structs.User, args ...any) (*structs.User, error) {
 	ctx := context.Background()
 
-	first, err := gorm.G[structs.User](pd.db).Where(query, args).First(ctx)
+	first, err := gorm.G[structs.User](pd.client).Where(query, args).First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -60,10 +60,10 @@ func (pd *PostgresDatabase) SelectUser(query any, args ...any) (*structs.User, e
 	return &first, nil
 }
 
-func (pd *PostgresDatabase) SelectUsers(query *any, args ...any) (*[]structs.User, error) {
+func (pd *PostgresDatabase) SelectUsers(query *structs.User, args ...any) (*[]structs.User, error) {
 	ctx := context.Background()
 
-	q := gorm.G[structs.User](pd.db)
+	q := gorm.G[structs.User](pd.client)
 
 	if query == nil {
 		all, err := q.Find(ctx)
@@ -79,4 +79,26 @@ func (pd *PostgresDatabase) SelectUsers(query *any, args ...any) (*[]structs.Use
 	}
 
 	return &users, nil
+}
+
+func (pd *PostgresDatabase) CreateUser(user *structs.User) (*structs.User, error) {
+	ctx := context.Background()
+
+	err := gorm.G[structs.User](pd.client).Create(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (pd *PostgresDatabase) UpdateUser(user *structs.User) (*structs.User, error) {
+	ctx := context.Background()
+
+	_, err := gorm.G[structs.User](pd.client).Updates(ctx, *user)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

@@ -15,11 +15,18 @@ func main() {
 
 	cfg := structs.NewEnvConfiguration(".env")
 	db := database.NewPostgresDatabase(cfg)
-	repo := repos.NewPostgresUserRepository(db)
-	service := services.NewDefaultUserService(repo)
-	controller := controllers.NewDefaultUserController(service)
 
-	router.HandleFunc("GET /users", controller.GetAllUsers)
+	userRepo := repos.NewPostgresUserRepository(db)
+	userService := services.NewDefaultUserService(userRepo)
+	userController := controllers.NewDefaultUserController(userService)
+
+	authService := services.NewDefaultAuthService(userRepo)
+	authController := controllers.NewDefaultAuthController(authService)
+
+	router.HandleFunc("GET /users", userController.GetUsers)
+	//router.HandleFunc("GET /users/:id", userController.GetUser)
+	router.HandleFunc("POST /users", userController.CreateUser)
+	router.HandleFunc("POST /auth/login", authController.LoginUser)
 
 	server := http.Server{
 		Addr:    ":8080",
@@ -30,8 +37,4 @@ func main() {
 	if err != nil {
 		log.Panicln("Error starting server:", err)
 	}
-}
-
-func Add(a int, b int) int {
-	return a + b
 }
