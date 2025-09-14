@@ -39,17 +39,17 @@ func (uc *DefaultUserController) CreateUser(w http.ResponseWriter, r *http.Reque
 	model := &structs.UserRegisterModel{}
 	err := decoder.Decode(model)
 	if err != nil {
-		utils.SendResponse[error](w, "Body not suitable", http.StatusBadRequest, &err)
+		utils.SetResponseError(r, *structs.BadRequestError(err.Error()))
 		return
 	}
 
 	user, err := service.CreateUser(model)
 	if err != nil {
-		utils.SendResponse[error](w, "Error occurred", http.StatusInternalServerError, &err)
+		utils.SetResponseError(r, *structs.InternalServerError(err.Error()))
 		return
 	}
 
-	utils.SendResponse[structs.User](w, "Created", http.StatusCreated, user)
+	utils.SetResponseResult[structs.User](r, *user)
 }
 
 func (uc *DefaultUserController) UpdateUser(w http.ResponseWriter, r *http.Request) {

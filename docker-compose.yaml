@@ -14,7 +14,7 @@ services:
     networks:
       zts_go:
     ports:
-      - "15432:15432"
+      - "15432:5432"
     volumes:
       - postgres:/data/postgres
   pgadmin:

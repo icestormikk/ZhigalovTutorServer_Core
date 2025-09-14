@@ -23,17 +23,17 @@ func (ac *DefaultAuthController) LoginUser(w http.ResponseWriter, r *http.Reques
 
 	err := decoder.Decode(userLoginModel)
 	if err != nil {
-		utils.SendResponse(w, "Bad Request", http.StatusBadRequest, &err)
+		utils.SetResponseError(r, *structs.InternalServerError("Error while decoding body"))
 		return
 	}
 
 	loggedInUser, err := service.LoginUser(userLoginModel)
 	if err != nil {
-		utils.SendResponse(w, err.Error(), http.StatusBadRequest, &err)
+		utils.SetResponseError(r, *structs.BadRequestError(err.Error()))
 		return
 	}
 
-	utils.SendResponse(w, "Logged In", http.StatusOK, loggedInUser)
+	utils.SetResponseResult[structs.User](r, *loggedInUser)
 }
 
 func (ac *DefaultAuthController) LogoutUser(w http.ResponseWriter, r *http.Request) {
